@@ -180,6 +180,250 @@ print(f"New length: {length2}, Array: {arr2[:length2]}")
 
 ---
 
+## Two Pointers on Two Arrays
+
+When working with **two separate arrays**, we can use one pointer for each array to efficiently solve problems that involve comparing, merging, or finding relationships between them. This pattern is especially powerful when both arrays are sorted.
+
+### When to Use Two Pointers on Two Arrays?
+
+Use this pattern when:
+- ✅ **Merging** two sorted arrays into one
+- ✅ Finding **common elements** or **intersection** between two sorted arrays
+- ✅ Comparing elements from two arrays simultaneously
+- ✅ Finding **differences** between two sorted sequences
+- ✅ Processing two arrays in **synchronized order**
+
+### Key Characteristics:
+- Each array has its own pointer
+- Pointers move independently based on comparison logic
+- Usually requires both arrays to be sorted (but not always)
+- Time complexity is typically O(m + n) where m and n are array lengths
+
+---
+
+### Example 4: Merge Two Sorted Arrays
+
+**Problem**: Given two sorted arrays, merge them into the first array in sorted order.
+
+```python
+def merge_sorted_arrays(nums1, m, nums2, n):
+    """
+    Merge two sorted arrays into nums1.
+    nums1 has enough space (size m+n) to hold all elements.
+    
+    Time Complexity: O(m + n) - visit each element once
+    Space Complexity: O(1) - merge in-place (or O(m+n) if creating new array)
+    
+    Args:
+        nums1: first sorted array with extra space
+        m: number of valid elements in nums1
+        nums2: second sorted array
+        n: number of elements in nums2
+    
+    Returns:
+        None - modifies nums1 in-place
+    """
+    # Start from the end to avoid overwriting elements
+    p1 = m - 1      # Pointer for last element in nums1
+    p2 = n - 1      # Pointer for last element in nums2
+    p = m + n - 1   # Pointer for last position in merged array
+    
+    # Merge from back to front
+    while p1 >= 0 and p2 >= 0:
+        # Compare elements and place larger one at the end
+        if nums1[p1] > nums2[p2]:
+            nums1[p] = nums1[p1]
+            p1 -= 1
+        else:
+            nums1[p] = nums2[p2]
+            p2 -= 1
+        p -= 1
+    
+    # If nums2 still has elements, copy them
+    # (no need to copy nums1 elements as they're already in place)
+    while p2 >= 0:
+        nums1[p] = nums2[p2]
+        p2 -= 1
+        p -= 1
+
+# Test cases
+arr1 = [1, 3, 5, 0, 0, 0]
+arr2 = [2, 4, 6]
+merge_sorted_arrays(arr1, 3, arr2, 3)
+print(f"Merged array: {arr1}")
+# Output: Merged array: [1, 2, 3, 4, 5, 6]
+
+arr3 = [4, 5, 6, 0, 0, 0]
+arr4 = [1, 2, 3]
+merge_sorted_arrays(arr3, 3, arr4, 3)
+print(f"Merged array: {arr3}")
+# Output: Merged array: [1, 2, 3, 4, 5, 6]
+```
+
+**Why it works**: By merging from back to front, we avoid overwriting elements in nums1 that we haven't processed yet. We compare elements from both arrays and place the larger one at the current position.
+
+---
+
+### Example 5: Find Common Elements in Two Sorted Arrays
+
+**Problem**: Given two sorted arrays, return an array of elements that appear in both arrays.
+
+```python
+def find_common_elements(nums1, nums2):
+    """
+    Find all common elements between two sorted arrays.
+    
+    Time Complexity: O(m + n) - single pass through both arrays
+    Space Complexity: O(min(m, n)) - for storing common elements
+    
+    Args:
+        nums1: first sorted array
+        nums2: second sorted array
+    
+    Returns:
+        List of common elements (without duplicates)
+    """
+    result = []
+    p1 = 0  # Pointer for nums1
+    p2 = 0  # Pointer for nums2
+    
+    # Traverse both arrays simultaneously
+    while p1 < len(nums1) and p2 < len(nums2):
+        # Skip duplicates in nums1
+        if p1 > 0 and nums1[p1] == nums1[p1 - 1]:
+            p1 += 1
+            continue
+        
+        # Skip duplicates in nums2
+        if p2 > 0 and nums2[p2] == nums2[p2 - 1]:
+            p2 += 1
+            continue
+        
+        # Found a common element
+        if nums1[p1] == nums2[p2]:
+            result.append(nums1[p1])
+            p1 += 1
+            p2 += 1
+        # nums1 element is smaller, move its pointer
+        elif nums1[p1] < nums2[p2]:
+            p1 += 1
+        # nums2 element is smaller, move its pointer
+        else:
+            p2 += 1
+    
+    return result
+
+# Test cases
+print(find_common_elements([1, 2, 2, 3, 4], [2, 2, 3, 5]))
+# Output: [2, 3]
+
+print(find_common_elements([1, 2, 3, 4, 5], [3, 4, 5, 6, 7]))
+# Output: [3, 4, 5]
+
+print(find_common_elements([1, 3, 5, 7], [2, 4, 6, 8]))
+# Output: []
+```
+
+**Why it works**: Since both arrays are sorted, we can advance pointers based on which element is smaller. When elements match, we found a common element. We skip duplicates to ensure each common element appears only once in the result.
+
+---
+
+### Example 6: Intersection of Two Sorted Arrays
+
+**Problem**: Given two sorted arrays, return the intersection (elements that appear in both), allowing duplicates based on frequency.
+
+```python
+def intersection_with_duplicates(nums1, nums2):
+    """
+    Find intersection of two sorted arrays, including duplicates.
+    Each element appears as many times as it shows in both arrays.
+    
+    Time Complexity: O(m + n) - single pass through both arrays
+    Space Complexity: O(min(m, n)) - for storing intersection
+    
+    Args:
+        nums1: first sorted array
+        nums2: second sorted array
+    
+    Returns:
+        List of intersection elements (with duplicates)
+    """
+    result = []
+    p1 = 0  # Pointer for nums1
+    p2 = 0  # Pointer for nums2
+    
+    # Traverse both arrays
+    while p1 < len(nums1) and p2 < len(nums2):
+        # Found matching elements
+        if nums1[p1] == nums2[p2]:
+            result.append(nums1[p1])
+            p1 += 1
+            p2 += 1
+        # nums1 element is smaller, advance p1
+        elif nums1[p1] < nums2[p2]:
+            p1 += 1
+        # nums2 element is smaller, advance p2
+        else:
+            p2 += 1
+    
+    return result
+
+# Test cases
+print(intersection_with_duplicates([1, 2, 2, 3, 4], [2, 2, 3, 5]))
+# Output: [2, 2, 3]
+
+print(intersection_with_duplicates([1, 1, 2, 2], [2, 2, 3, 3]))
+# Output: [2, 2]
+
+print(intersection_with_duplicates([1, 2, 3], [4, 5, 6]))
+# Output: []
+```
+
+**Why it works**: Both pointers advance together when elements match, capturing all duplicate occurrences. When elements don't match, we advance the pointer pointing to the smaller element to potentially find a match.
+
+---
+
+### Pattern 3: Two Arrays (One Pointer Each)
+
+```python
+# General template for two arrays
+p1 = 0  # Pointer for first array
+p2 = 0  # Pointer for second array
+
+while p1 < len(array1) and p2 < len(array2):
+    if array1[p1] meets_condition array2[p2]:
+        # Process matching elements
+        p1 += 1
+        p2 += 1
+    elif array1[p1] < array2[p2]:
+        # First array element is smaller
+        p1 += 1
+    else:
+        # Second array element is smaller
+        p2 += 1
+
+# Process remaining elements if needed
+while p1 < len(array1):
+    # Handle remaining elements in array1
+    p1 += 1
+
+while p2 < len(array2):
+    # Handle remaining elements in array2
+    p2 += 1
+```
+
+### Complexity Analysis for Two Arrays Pattern
+
+| Operation | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| **Merge Two Arrays** | O(m + n) | O(1) or O(m+n) | O(1) if merging in-place, O(m+n) for new array |
+| **Find Intersection** | O(m + n) | O(min(m, n)) | Need to store common elements |
+| **Find Common Elements** | O(m + n) | O(min(m, n)) | Similar to intersection |
+
+**Why O(m + n)?** Each pointer traverses its respective array at most once. Even though we have two pointers, they move independently through different arrays, so we visit each element exactly once.
+
+---
+
 ## Time and Space Complexity
 
 ### Typical Complexities:
@@ -195,9 +439,10 @@ Even though we have two pointers, each element is visited at most once. The poin
 
 ---
 
-## Common Patterns
+## Common Patterns Summary
 
 ### Pattern 1: Opposite Direction (Converging)
+**Use for**: Palindromes, Two Sum in sorted arrays, Container with Most Water
 ```python
 left = 0
 right = len(array) - 1
@@ -210,6 +455,7 @@ while left < right:
 ```
 
 ### Pattern 2: Same Direction (Fast and Slow)
+**Use for**: Remove duplicates, Remove elements, Partition arrays
 ```python
 slow = 0
 
@@ -218,6 +464,24 @@ for fast in range(len(array)):
     # Slow pointer tracks valid position
     if condition:
         slow += 1
+```
+
+### Pattern 3: Two Arrays (One Pointer Each)
+**Use for**: Merge sorted arrays, Find intersection, Compare two sequences
+```python
+p1, p2 = 0, 0
+
+while p1 < len(array1) and p2 < len(array2):
+    # Compare elements from both arrays
+    # Move pointers based on comparison
+    if array1[p1] == array2[p2]:
+        # Process match
+        p1 += 1
+        p2 += 1
+    elif array1[p1] < array2[p2]:
+        p1 += 1
+    else:
+        p2 += 1
 ```
 
 ---
@@ -235,12 +499,22 @@ for fast in range(len(array)):
 ## Practice Problems
 
 Great LeetCode problems to practice Two Pointers:
+
+**Single Array Problems:**
 - **Two Sum II** (Sorted Array) - Easy
 - **Valid Palindrome** - Easy  
 - **Remove Duplicates from Sorted Array** - Easy
 - **Container With Most Water** - Medium
 - **3Sum** - Medium
 - **Trapping Rain Water** - Hard
+
+**Two Arrays Problems:**
+- **Merge Sorted Array** - Easy
+- **Intersection of Two Arrays** - Easy
+- **Intersection of Two Arrays II** - Easy
+- **Squares of a Sorted Array** - Easy
+- **Merge Two Sorted Lists** - Easy
+- **Find Median of Two Sorted Arrays** - Hard
 
 ---
 
@@ -250,9 +524,12 @@ The Two Pointers technique is a powerful optimization tool that can:
 - Reduce time complexity from O(n²) to O(n)
 - Work efficiently with sorted data
 - Solve problems in-place with O(1) space
+- Handle multiple arrays with O(m + n) time complexity
 
 Master this technique by recognizing when problems involve:
 - Searching pairs in sorted arrays
 - Checking symmetry (palindromes)
 - In-place array modifications
-- Merging or partitioning operations
+- **Merging or combining two arrays**
+- **Finding intersections or common elements**
+- Partitioning operations
