@@ -289,21 +289,15 @@ def find_common_elements(nums1, nums2):
     
     # Traverse both arrays simultaneously
     while p1 < len(nums1) and p2 < len(nums2):
-        # Skip duplicates in nums1
-        if p1 > 0 and nums1[p1] == nums1[p1 - 1]:
-            p1 += 1
-            continue
-        
-        # Skip duplicates in nums2
-        if p2 > 0 and nums2[p2] == nums2[p2 - 1]:
-            p2 += 1
-            continue
-        
         # Found a common element
         if nums1[p1] == nums2[p2]:
             result.append(nums1[p1])
-            p1 += 1
-            p2 += 1
+            # Skip all duplicates in both arrays
+            current_val = nums1[p1]
+            while p1 < len(nums1) and nums1[p1] == current_val:
+                p1 += 1
+            while p2 < len(nums2) and nums2[p2] == current_val:
+                p2 += 1
         # nums1 element is smaller, move its pointer
         elif nums1[p1] < nums2[p2]:
             p1 += 1
