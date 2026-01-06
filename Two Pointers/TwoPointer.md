@@ -156,8 +156,8 @@ def remove_duplicates(nums):
     
     # Fast pointer explores the array
     for fast in range(1, len(nums)):
-        # Found a new unique element
         if nums[fast] != nums[slow]:
+            # Found a new unique element
             slow += 1                    # Move slow pointer
             nums[slow] = nums[fast]      # Place unique element
     
@@ -224,7 +224,7 @@ for fast in range(len(array)):
 
 ## Tips for Success
 
-1. **Identify if array/string is sorted** - Two Pointers works best with sorted data
+1. **Identify if array/string is sorted** - Many Two Pointers problems involve sorted data (for search/sum operations), but the technique also works on unsorted data (e.g., cycle detection, sliding window)
 2. **Determine pointer direction** - Opposite or same direction based on problem
 3. **Define pointer movement logic** - When and how to move each pointer
 4. **Handle edge cases** - Empty arrays, single elements, no solution found
